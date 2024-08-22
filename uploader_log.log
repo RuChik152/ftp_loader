@@ -1,0 +1,6 @@
+Logs are written to: /tmp/oc_cli_5624606340920620_2024-08-22T11-55-05-598Z.log
+
+
+ERROR: 
+
+An APK has already been uploaded with version code 1278. Please update the application manifest's version code to 1279 or higher and try again.

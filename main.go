@@ -19,6 +19,7 @@ var (
 	OCULUS_APP_SECRET string
 	PATH_APK          string
 	PATH_OBB          string
+	URL_TO_BOT        string
 	listArgs          = make(map[string]string, 0)
 )
 
@@ -62,6 +63,13 @@ func init() {
 		log.Fatalln("PATH_OBB not found")
 	} else {
 		listArgs["PATH_OBB"] = PATH_OBB
+	}
+
+	URL_TO_BOT = os.Getenv("URL_TO_BOT")
+	if URL_TO_BOT == "" {
+		log.Fatalln("URL_TO_BOT not found")
+	} else {
+		listArgs["URL_TO_BOT"] = URL_TO_BOT
 	}
 
 	for i, k := range listArgs {
@@ -108,15 +116,19 @@ func handelUpload(w http.ResponseWriter, r *http.Request) {
 		"ALPHA",
 	}
 
+	log.Println("args: ", args)
 	cmd := exec.Command(PATH_UPLOADER_MOD, args...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatal(fmt.Errorf("run uploader mod, path: %s, ERROR: %w", PATH_UPLOADER_MOD, err))
+		log.Println(fmt.Errorf("run uploader mod, path: %s, ERROR: %w", PATH_UPLOADER_MOD, err))
 		echoToBot(false)
+		fmt.Fprintf(w, "ERROR")
+	} else {
+		fmt.Fprintf(w, "SUCESS")
+		log.Println(string(output))
+		echoToBot(true)
 	}
 
-	log.Println(string(output))
-	echoToBot(true)
 }
 
 type Status struct {
@@ -137,7 +149,7 @@ func echoToBot(answer bool) {
 
 	data := bytes.NewReader(jsonData)
 
-	resp, err := client.Post("http://localhost:3030", "application/json", data)
+	resp, err := client.Post(URL_TO_BOT, "application/json", data)
 
 	if err != nil {
 		log.Println(fmt.Errorf("response request: %w", err))
